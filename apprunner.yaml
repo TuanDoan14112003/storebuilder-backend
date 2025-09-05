@@ -4,7 +4,7 @@ build:
   commands:
     build:
       - pip3 install --upgrade pip
-      - pip3 install -r requirements.txt
+      - pip3 install --no-cache-dir -r requirements.txt
 run:
   runtime-version: 3.11.13
   pre-run:
@@ -12,7 +12,6 @@ run:
     - pip3 install gunicorn
     - pip3 install --no-cache-dir -r requirements.txt
     - which gunicorn
-    - python3 manage.py collectstatic --noinput
   command: sh startup.sh
   network:
     port: 8080
