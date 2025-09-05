@@ -22,7 +22,6 @@ class Product(models.Model):
     description = models.TextField(blank=True)
     stock = models.IntegerField(default=0)
     image = models.ImageField(upload_to='products/', blank=True, null=True)
-    is_available = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -42,7 +41,9 @@ class Order(models.Model):
         ('cancelled', 'Cancelled'),
     ]
     
-    customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
+    customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders', null=True, blank=True)
+    guest_email = models.EmailField(null=True, blank=True)
+    guest_name = models.CharField(max_length=100, null=True, blank=True)
     store = models.ForeignKey(Store, on_delete=models.CASCADE, related_name='orders')
     products = models.ManyToManyField(Product, through='OrderItem')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
@@ -57,7 +58,9 @@ class Order(models.Model):
         ordering = ['-created_at']
         
     def __str__(self):
-        return f"Order #{self.id} - {self.customer.username}"
+        if self.customer:
+            return f"Order #{self.id} - {self.customer.username}"
+        return f"Order #{self.id} - {self.guest_email or self.guest_name}"
 
 
 class OrderItem(models.Model):
@@ -71,3 +74,44 @@ class OrderItem(models.Model):
         
     def __str__(self):
         return f"{self.quantity}x {self.product.name}"
+
+
+class Cart(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='cart', null=True, blank=True)
+    session_key = models.CharField(max_length=40, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = [['user'], ['session_key']]
+    
+    def __str__(self):
+        if self.user:
+            return f"Cart - {self.user.username}"
+        return f"Guest Cart - {self.session_key}"
+    
+    @property
+    def total_amount(self):
+        return sum(item.subtotal for item in self.items.all())
+    
+    @property
+    def total_items(self):
+        return sum(item.quantity for item in self.items.all())
+
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['cart', 'product']
+        
+    def __str__(self):
+        return f"{self.quantity}x {self.product.name}"
+    
+    @property
+    def subtotal(self):
+        return self.quantity * self.product.price
