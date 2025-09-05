@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Store, Product, Order, OrderItem
+from .models import Store, Product, Order, OrderItem, Cart, CartItem
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -83,3 +83,51 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             OrderItem.objects.create(order=order, **item_data)
         
         return order
+
+
+# Cart Serializers
+class CartItemSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)
+    product_id = serializers.IntegerField(write_only=True)
+    subtotal = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product', 'product_id', 'quantity', 'subtotal', 'created_at', 'updated_at']
+
+
+class CartSerializer(serializers.ModelSerializer):
+    items = CartItemSerializer(many=True, read_only=True)
+    total_amount = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    total_items = serializers.IntegerField(read_only=True)
+    
+    class Meta:
+        model = Cart
+        fields = ['id', 'items', 'total_amount', 'total_items', 'created_at', 'updated_at']
+
+
+class AddToCartSerializer(serializers.Serializer):
+    product_id = serializers.IntegerField()
+    quantity = serializers.IntegerField(default=1, min_value=1)
+
+
+class UpdateCartItemSerializer(serializers.Serializer):
+    quantity = serializers.IntegerField(min_value=0)
+
+
+class CreateGuestOrderSerializer(serializers.ModelSerializer):
+    guest_email = serializers.EmailField(required=False, allow_blank=True)
+    guest_name = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    
+    class Meta:
+        model = Order
+        fields = ['guest_email', 'guest_name', 'shipping_address', 'phone', 'notes']
+    
+    def validate(self, attrs):
+        request = self.context.get('request')
+        if not request.user.is_authenticated:
+            if not attrs.get('guest_email') and not attrs.get('guest_name'):
+                raise serializers.ValidationError(
+                    "Guest email or name is required for non-authenticated users"
+                )
+        return attrs
