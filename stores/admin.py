@@ -12,11 +12,11 @@ class StoreAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'store', 'price', 'stock', 'is_available', 'created_at']
-    list_filter = ['is_available', 'store', 'created_at']
+    list_display = ['name', 'store', 'price', 'stock', 'created_at']
+    list_filter = ['store', 'created_at']
     search_fields = ['name', 'store__name', 'description']
     readonly_fields = ['created_at', 'updated_at']
-    list_editable = ['price', 'stock', 'is_available']
+    list_editable = ['price', 'stock']
 
 
 class OrderItemInline(admin.TabularInline):
