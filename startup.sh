@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 set -e
+cd /opt/app
 python3 manage.py collectstatic --noinput
 # Optional: [ "$RUN_MIGRATIONS" = "1" ] && python3 manage.py migrate --noinput
 exec gunicorn storebuilder.wsgi:application \
