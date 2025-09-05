@@ -169,4 +169,4 @@ USE_X_FORWARDED_HOST = True
 
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-CSRF_TRUSTED_ORIGINS = ['https://storic.shop','https://www.storic.shop']
+CSRF_TRUSTED_ORIGINS = ['https://api.storic.shop','https://www.api.storic.shop']
