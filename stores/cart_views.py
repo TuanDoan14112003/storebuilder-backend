@@ -3,12 +3,22 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.db import transaction
+from django.middleware.csrf import get_token
+from django.http import JsonResponse
 from .cart_service import CartService
 from .serializers import (
     CartSerializer, AddToCartSerializer, UpdateCartItemSerializer, 
     CreateGuestOrderSerializer, OrderSerializer
 )
 from .models import Order, OrderItem
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_csrf_token(request):
+    """Get CSRF token for frontend requests"""
+    csrf_token = get_token(request)
+    return JsonResponse({'csrf_token': csrf_token})
 
 
 @api_view(['GET'])

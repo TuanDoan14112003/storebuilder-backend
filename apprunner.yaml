@@ -7,6 +7,9 @@ build:
       - pip3 install --no-cache-dir -r requirements.txt
 run:
   runtime-version: 3.11.13
+  env:
+    - name: DEBUG
+      value: "False"
   pre-run:
     - pip3 install --upgrade pip
     - pip3 install gunicorn
