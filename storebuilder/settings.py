@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+from corsheaders.defaults import default_headers
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -169,4 +170,5 @@ USE_X_FORWARDED_HOST = True
 
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-CSRF_TRUSTED_ORIGINS = ['https://api.storic.shop','https://www.api.storic.shop']
+CSRF_TRUSTED_ORIGINS = ['https://api.storic.shop','https://www.api.storic.shop', "https://storic.shop", "https://www.storic.shop"]
+CORS_ALLOW_HEADERS = list(default_headers) + ["authorization", "content-type"]
