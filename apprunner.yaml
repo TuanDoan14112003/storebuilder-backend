@@ -18,3 +18,12 @@ run:
   command: sh startup.sh
   network:
     port: 8080
+  secrets:
+    - name: AWS_ACCESS_KEY_ID
+      value-from: "arn:aws:secretsmanager:ap-southeast-2:550833547950:secret:storebuilder-tXOhB8"
+    - name: AWS_SECRET_ACCESS_KEY
+      value-from: "arn:aws:secretsmanager:ap-southeast-2:550833547950:secret:storebuilder-tXOhB8"
+    - name: AWS_STORAGE_BUCKET_NAME
+      value-from: "arn:aws:secretsmanager:ap-southeast-2:550833547950:secret:storebuilder-tXOhB8"
+    - name: AWS_S3_REGION_NAME
+      value-from: "arn:aws:secretsmanager:ap-southeast-2:550833547950:secret:storebuilder-tXOhB8"
